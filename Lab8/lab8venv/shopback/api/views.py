@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from api.models import Category, Product
 # Create your views here.
 
+
 def products_list(request):
     products = Product.objects.all()
     product_json = list(product.to_json() for product in products)
@@ -28,3 +29,13 @@ def category_detail(request, category_id):
         return JsonResponse({'message': str(e)}, status = 400)
     
     return JsonResponse(category.to_json())
+
+def category_products(request, categoryid):
+    try:
+        category = Category.objects.get(category_id = categoryid)
+    except Category.DoesNotExist as e:
+        return JsonResponse({'message': str(e)}, status = 400)
+
+    products = Product.objects.all().filter(category=int(categoryid))
+    product_json = list(product.to_json() for product in products)
+    return JsonResponse(product_json, safe = False)
